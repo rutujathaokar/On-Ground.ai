@@ -6,8 +6,10 @@ import {
   Smile,
   CheckCircle2,
   Calendar,
-  MessageSquare
+  MessageSquare,
+  Sparkles
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 
@@ -36,11 +38,29 @@ export const PulseChannelPage = () => {
     setInputMessage('');
   };
 
+  const handleActionClick = (action) => {
+    respondToNeedsInput(action);
+    try {
+      confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { y: 0.7 }
+      });
+    } catch (e) {}
+  };
+
   const handleCustomAnswerSubmit = (e) => {
     e.preventDefault();
     if (!customAnswer.trim()) return;
     respondToNeedsInput('custom', customAnswer);
     setCustomAnswer('');
+    try {
+      confetti({
+        particleCount: 40,
+        spread: 50,
+        origin: { y: 0.7 }
+      });
+    } catch (e) {}
   };
 
   return (
@@ -82,7 +102,7 @@ export const PulseChannelPage = () => {
 
         {/* Action Controls or Resolved State */}
         {pinnedInput.status === 'resolved' ? (
-          <div className="mt-3 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-semibold flex items-center gap-2">
+          <div className="mt-3 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-semibold flex items-center gap-2 animate-fade-in">
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             <span>Response recorded: {pinnedInput.response}</span>
           </div>
@@ -90,13 +110,13 @@ export const PulseChannelPage = () => {
           <div className="space-y-3 mt-3">
             <div className="flex items-center gap-2">
               <button
-                onClick={() => respondToNeedsInput('confirmed')}
+                onClick={() => handleActionClick('confirmed')}
                 className="px-4 py-1.5 rounded-xl bg-white border border-gray-300 hover:border-gray-400 text-xs font-bold text-gray-800 shadow-2xs hover:bg-gray-50 active:scale-95 transition-all"
               >
                 Confirmed
               </button>
               <button
-                onClick={() => respondToNeedsInput('reschedule')}
+                onClick={() => handleActionClick('reschedule')}
                 className="px-4 py-1.5 rounded-xl bg-white border border-gray-300 hover:border-gray-400 text-xs font-bold text-gray-800 shadow-2xs hover:bg-gray-50 active:scale-95 transition-all"
               >
                 Reschedule
@@ -134,7 +154,7 @@ export const PulseChannelPage = () => {
           if (msg.isSelf) {
             // Current User Bubble (Green on Right)
             return (
-              <div key={msg.id} className="flex flex-col items-end">
+              <div key={msg.id} className="flex flex-col items-end animate-fade-in">
                 <span className="text-[10px] text-gray-400 mr-2 mb-1">
                   You {msg.time}
                 </span>
@@ -147,7 +167,7 @@ export const PulseChannelPage = () => {
 
           // Other Member Bubble (Left)
           return (
-            <div key={msg.id} className="flex items-start gap-3">
+            <div key={msg.id} className="flex items-start gap-3 animate-fade-in">
               <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-900 font-bold text-xs flex items-center justify-center flex-shrink-0 border border-amber-200/60 mt-1">
                 {msg.initials}
               </div>

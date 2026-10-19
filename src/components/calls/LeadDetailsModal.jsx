@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Users,
   X,
@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   Clock
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { useApp } from '../../context/AppContext';
 
 export const LeadDetailsModal = () => {
@@ -29,6 +30,24 @@ export const LeadDetailsModal = () => {
 
   const [expandedSection, setExpandedSection] = useState('signals'); // 'icp', 'journey', 'signals'
 
+  // Keyboard navigation: Escape closes modal, Left/Right arrows navigate
+  useEffect(() => {
+    if (!isLeadsModalOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        closeLeadsModal();
+      } else if (e.key === 'ArrowRight') {
+        nextLead();
+      } else if (e.key === 'ArrowLeft') {
+        prevLead();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isLeadsModalOpen, nextLead, prevLead, closeLeadsModal]);
+
   if (!isLeadsModalOpen) return null;
 
   const lead = leads[activeLeadIndex] || leads[0];
@@ -40,6 +59,13 @@ export const LeadDetailsModal = () => {
 
   const handleCallFromModal = () => {
     closeLeadsModal();
+    try {
+      confetti({
+        particleCount: 40,
+        spread: 60,
+        origin: { y: 0.8 }
+      });
+    } catch (e) {}
     startCall(lead);
   };
 
@@ -62,7 +88,7 @@ export const LeadDetailsModal = () => {
           <button
             onClick={closeLeadsModal}
             className="p-1.5 rounded-full hover:bg-purple-700/60 text-purple-200 hover:text-white transition-colors"
-            title="Close"
+            title="Close (Esc)"
           >
             <X className="w-5 h-5" />
           </button>
@@ -73,7 +99,7 @@ export const LeadDetailsModal = () => {
           <button
             onClick={prevLead}
             className="p-1 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-200 transition-colors"
-            title="Previous Lead"
+            title="Previous Lead (Left Arrow)"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -96,7 +122,7 @@ export const LeadDetailsModal = () => {
           <button
             onClick={nextLead}
             className="p-1 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-200 transition-colors"
-            title="Next Lead"
+            title="Next Lead (Right Arrow)"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
